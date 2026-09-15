@@ -188,7 +188,7 @@ export default function CompanyDetailPage({
               </div>
 
               {/* SPEC REQUIREMENT: Photo Grid */}
-              <div className="glass-card p-5 sm:p-6">
+              <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border-primary)] p-5 sm:p-6">
                 <PhotoGrid companyName={company.name} />
               </div>
 

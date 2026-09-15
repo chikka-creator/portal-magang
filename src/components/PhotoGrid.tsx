@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface PhotoItem {
   id: string;
@@ -46,6 +47,24 @@ const DEFAULT_PHOTOS: Record<string, PhotoItem[]> = {
 export default function PhotoGrid({ photos, companyName }: PhotoGridProps) {
   const displayPhotos = photos && photos.length > 0 ? photos : DEFAULT_PHOTOS.default;
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoItem | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Keyboard accessibility: Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedPhoto(null);
+      }
+    };
+    if (selectedPhoto) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedPhoto]);
 
   return (
     <div className="w-full">
@@ -69,9 +88,9 @@ export default function PhotoGrid({ photos, companyName }: PhotoGridProps) {
           <div
             key={photo.id}
             onClick={() => setSelectedPhoto(photo)}
-            className="group relative cursor-pointer overflow-hidden rounded-lg border border-[var(--border-primary)] bg-[var(--bg-card)] transition-all duration-200 hover:border-[var(--border-hover)]"
+            className="group relative cursor-pointer overflow-hidden rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] transition-all duration-200 hover:border-[var(--border-hover)] hover:shadow-md"
           >
-            {/* STRICT 3:4 ASPECT RATIO CONTAINER (as per spec) */}
+            {/* STRICT 3:4 ASPECT RATIO CONTAINER */}
             <div className="relative w-full aspect-[3/4] overflow-hidden bg-black/40">
               <img
                 src={photo.url}
@@ -86,7 +105,7 @@ export default function PhotoGrid({ photos, companyName }: PhotoGridProps) {
               {/* Tag */}
               {photo.tag && (
                 <div className="absolute top-2 left-2">
-                  <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-black/70 text-zinc-200 backdrop-blur-sm border border-white/10">
+                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-black/75 text-zinc-200 backdrop-blur-sm border border-white/10">
                     {photo.tag}
                   </span>
                 </div>
@@ -94,7 +113,7 @@ export default function PhotoGrid({ photos, companyName }: PhotoGridProps) {
 
               {/* Caption */}
               <div className="absolute bottom-2.5 left-2.5 right-2.5">
-                <p className="text-xs font-normal text-zinc-200 line-clamp-2 leading-tight">
+                <p className="text-xs font-medium text-zinc-100 line-clamp-2 leading-tight">
                   {photo.caption}
                 </p>
               </div>
@@ -103,43 +122,64 @@ export default function PhotoGrid({ photos, companyName }: PhotoGridProps) {
         ))}
       </div>
 
-      {/* Lightbox Modal */}
-      {selectedPhoto && (
+      {/* Lightbox Modal rendered via Portal to prevent any parent transform/overflow glitch */}
+      {selectedPhoto && mounted && createPortal(
         <div
-          className="modal-overlay"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in-0 duration-200"
           onClick={() => setSelectedPhoto(null)}
         >
           <div
-            className="relative max-w-sm w-full mx-4 overflow-hidden rounded-xl bg-[var(--bg-card)] border border-[var(--border-hover)] shadow-2xl animate-fade-in-up"
+            className="relative max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-[var(--bg-card)] border border-[var(--border-hover)] shadow-2xl animate-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
+            style={{
+              boxShadow: "0 25px 60px -15px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08)",
+            }}
           >
-            <div className="relative w-full aspect-[3/4] overflow-hidden bg-black">
-              <img
-                src={selectedPhoto.url}
-                alt={selectedPhoto.caption}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="p-3.5 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-[var(--text-primary)]">
-                  {selectedPhoto.caption}
-                </p>
+            {/* Modal Header */}
+            <div className="p-3.5 px-4 flex items-center justify-between border-b border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+              <div className="flex items-center gap-2 min-w-0">
                 {selectedPhoto.tag && (
-                  <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                    Kategori: {selectedPhoto.tag}
-                  </p>
+                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 flex-shrink-0">
+                    {selectedPhoto.tag}
+                  </span>
                 )}
+                <h4 className="text-xs font-semibold text-[var(--text-primary)] truncate">
+                  {selectedPhoto.caption}
+                </h4>
               </div>
               <button
                 onClick={() => setSelectedPhoto(null)}
-                className="btn-ghost text-xs py-1 px-2.5"
+                aria-label="Tutup popup foto"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--accent-tint)] transition-colors flex-shrink-0 ml-2 text-sm font-semibold"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Photo Container */}
+            <div className="relative w-full max-h-[60vh] flex-1 overflow-hidden bg-black flex items-center justify-center">
+              <img
+                src={selectedPhoto.url}
+                alt={selectedPhoto.caption}
+                className="w-full h-full object-contain max-h-[60vh]"
+              />
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-3.5 px-4 flex items-center justify-between border-t border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+              <p className="text-xs text-[var(--text-muted)] truncate mr-2">
+                {companyName ? `Dokumentasi magang di ${companyName}` : "Dokumentasi magang SMK"}
+              </p>
+              <button
+                onClick={() => setSelectedPhoto(null)}
+                className="btn-primary text-xs py-1.5 px-4 flex-shrink-0"
               >
                 Tutup
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

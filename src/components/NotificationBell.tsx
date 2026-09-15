@@ -203,14 +203,21 @@ export default function NotificationBell() {
 
       {/* ──────────────── Dropdown Panel ──────────────── */}
       {isOpen && (
-        <div
-          className="absolute left-0 mt-2.5 w-[360px] max-w-[calc(100vw-24px)] rounded-2xl border border-[var(--border-hover)] bg-[var(--bg-card)]/95 backdrop-blur-xl shadow-2xl z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150"
-          style={{
-            boxShadow: "0 20px 40px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06)",
-          }}
-        >
-          {/* Header */}
-          <div className="p-3.5 border-b border-[var(--border-primary)] bg-[var(--bg-secondary)]/50">
+        <>
+          {/* Mobile backdrop to dismiss dropdown cleanly */}
+          <div
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs sm:hidden"
+            onClick={() => setIsOpen(false)}
+          />
+
+          <div
+            className="fixed top-16 left-3 right-3 sm:absolute sm:top-full sm:left-0 sm:right-auto sm:mt-2.5 w-auto sm:w-[380px] max-w-[calc(100vw-24px)] rounded-2xl border border-[var(--border-hover)] bg-[var(--bg-card)] dark:bg-[#18181b] bg-white shadow-2xl z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150"
+            style={{
+              boxShadow: "0 25px 50px -12px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08)",
+            }}
+          >
+            {/* Header */}
+            <div className="p-3.5 border-b border-[var(--border-primary)] bg-[var(--bg-secondary)] dark:bg-[#121215] bg-zinc-50">
             <div className="flex items-center justify-between mb-2.5">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-xs tracking-tight text-[var(--text-primary)]">
@@ -358,13 +365,14 @@ export default function NotificationBell() {
           </div>
 
           {/* Footer */}
-          <div className="p-2.5 border-t border-[var(--border-primary)] bg-[var(--bg-secondary)]/30 flex items-center justify-between text-[11px] text-[var(--text-muted)] px-3.5">
+          <div className="p-2.5 border-t border-[var(--border-primary)] bg-[var(--bg-secondary)] dark:bg-[#121215] bg-zinc-50 flex items-center justify-between text-[11px] text-[var(--text-muted)] px-3.5">
             <span>
               {notifications.filter((n) => n.is_read).length} dari {notifications.length} ulasan/tanggapan dibaca
             </span>
             <span className="text-[10px] font-mono opacity-75">Auto-refresh</span>
           </div>
         </div>
+        </>
       )}
 
       {/* Animation Style */}

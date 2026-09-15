@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { formatRupiah, formatRelativeTime } from "@/lib/format";
 import StarRating from "./StarRating";
 import CompanyReplyCard from "./CompanyReplyCard";
@@ -17,12 +18,17 @@ export default function ReviewCard({
   index = 0,
   showCompanyName = false,
 }: ReviewCardProps) {
+  const [mounted, setMounted] = useState(false);
   const [helpfulCount, setHelpfulCount] = useState(review.helpful_count);
   const [hasVoted, setHasVoted] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
   const [showFlagModal, setShowFlagModal] = useState(false);
   const [flagReason, setFlagReason] = useState("spam");
   const [flagDesc, setFlagDesc] = useState("");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [flagStatus, setFlagStatus] = useState<string | null>(null);
   const [isFlagSubmitting, setIsFlagSubmitting] = useState(false);
   const [flagError, setFlagError] = useState("");
@@ -256,9 +262,9 @@ export default function ReviewCard({
       </div>
 
       {/* Flag Modal */}
-      {showFlagModal && (
+      {showFlagModal && mounted && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md transition-opacity"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md transition-opacity"
           onClick={(e) => {
             if (e.target === e.currentTarget && !isFlagSubmitting) {
               setShowFlagModal(false);
@@ -468,7 +474,8 @@ export default function ReviewCard({
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
