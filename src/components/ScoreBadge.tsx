@@ -12,9 +12,9 @@ export default function ScoreBadge({
   size = "md",
 }: ScoreBadgeProps) {
   const sizeConfig = {
-    sm: { badge: "p-2", text: "text-[10px]", score: "text-sm" },
-    md: { badge: "p-3", text: "text-xs", score: "text-base" },
-    lg: { badge: "p-4", text: "text-xs", score: "text-xl" },
+    sm: { badge: "p-2", text: "text-[10px]", score: "text-xs" },
+    md: { badge: "p-2.5", text: "text-[11px]", score: "text-sm" },
+    lg: { badge: "p-3.5", text: "text-xs", score: "text-lg" },
   };
 
   const config = sizeConfig[size];
@@ -23,10 +23,10 @@ export default function ScoreBadge({
     <div
       className={`
         ${config.badge} rounded-lg
-        bg-[var(--accent-tint)]
+        bg-[var(--bg-secondary)]/60
         border border-[var(--border-primary)]
         flex flex-col items-center justify-center text-center
-        transition-all duration-150
+        transition-all duration-150 shadow-2xs
       `}
     >
       <span className={`${config.score} font-semibold text-[var(--text-primary)] font-mono`}>

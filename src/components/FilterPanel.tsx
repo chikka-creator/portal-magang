@@ -35,18 +35,16 @@ export default function FilterPanel({
     sortBy !== "reviews";
 
   return (
-    <div className="glass-card p-4 sm:p-5 space-y-4 animate-in fade-in duration-200">
+    <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border-primary)] p-4 sm:p-5 space-y-4 animate-in fade-in duration-200 shadow-xs">
       <div className="flex items-center justify-between">
-        <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-          </svg>
-          Filter Lanjutan
+        <h4 className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-1.5">
+          <span className="text-[8px]">■</span>
+          <span>Filter Lanjutan</span>
         </h4>
         {isFiltered && (
           <button
             onClick={onReset}
-            className="text-[11px] text-muted-foreground hover:text-foreground underline transition-colors"
+            className="text-[11px] text-[var(--text-muted)] hover:text-[var(--text-primary)] underline transition-colors"
           >
             Reset Filter
           </button>
@@ -57,8 +55,8 @@ export default function FilterPanel({
         {/* 1. Uang Saku Range Slider */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <span className="text-muted-foreground font-medium">Uang Saku Min.</span>
-            <span className="font-mono font-semibold text-foreground">
+            <span className="text-[var(--text-muted)] font-medium">Uang Saku Min.</span>
+            <span className="font-mono font-semibold text-[var(--text-primary)]">
               {formatRupiah(minStipend)}
             </span>
           </div>
@@ -69,9 +67,9 @@ export default function FilterPanel({
             step={50000}
             value={minStipend}
             onChange={(e) => onMinStipendChange(Number(e.target.value))}
-            className="w-full accent-primary h-1.5 bg-muted rounded-lg appearance-none cursor-pointer"
+            className="w-full accent-[#18181A] h-1.5 bg-[var(--bg-secondary)] rounded-lg appearance-none cursor-pointer"
           />
-          <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
+          <div className="flex justify-between text-[10px] text-[var(--text-muted)] font-mono">
             <span>Rp 0</span>
             <span>Rp 1.5jt+</span>
           </div>
@@ -79,7 +77,7 @@ export default function FilterPanel({
 
         {/* 2. Rating Minimal */}
         <div className="space-y-2">
-          <span className="block text-muted-foreground font-medium">Rating Minimum</span>
+          <span className="block text-[var(--text-muted)] font-medium">Rating Minimum</span>
           <div className="flex items-center gap-1.5 flex-wrap">
             {[0, 3, 3.5, 4, 4.5].map((val) => (
               <button
@@ -88,8 +86,8 @@ export default function FilterPanel({
                 onClick={() => onMinRatingChange(val)}
                 className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
                   minRating === val
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:text-foreground"
+                    ? "bg-[var(--accent-primary)] text-[var(--bg-primary)]"
+                    : "bg-[var(--accent-tint)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                 }`}
               >
                 {val === 0 ? "Semua" : `★ ${val}+`}
@@ -100,20 +98,27 @@ export default function FilterPanel({
 
         {/* 3. Urutkan Berdasarkan */}
         <div className="space-y-2">
-          <span className="block text-muted-foreground font-medium">Urutkan Hasil</span>
-          <select
-            value={`${sortBy}_${sortOrder}`}
-            onChange={(e) => {
-              const [by, ord] = e.target.value.split("_");
-              onSortChange(by, ord);
-            }}
-            className="w-full px-3 py-1.5 bg-background border border-input rounded-md text-foreground text-xs"
-          >
-            <option value="reviews_desc">Ulasan Terbanyak</option>
-            <option value="rating_desc">Rating Tertinggi (★)</option>
-            <option value="stipend_desc">Uang Saku Tertinggi (Rp)</option>
-            <option value="name_asc">Nama Perusahaan (A - Z)</option>
-          </select>
+          <span className="block text-[var(--text-muted)] font-medium">Urutkan</span>
+          <div className="flex items-center gap-2">
+            <select
+              value={sortBy}
+              onChange={(e) => onSortChange(e.target.value, sortOrder)}
+              className="flex-1 bg-[var(--bg-card)] border border-[var(--border-primary)] rounded-md px-2 py-1 text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--border-focus)]"
+            >
+              <option value="reviews">Jumlah Ulasan</option>
+              <option value="stipend">Uang Saku Tertinggi</option>
+              <option value="environment">Skor Lingkungan</option>
+              <option value="mentorship">Skor Mentorship</option>
+            </select>
+            <button
+              type="button"
+              onClick={() => onSortChange(sortBy, sortOrder === "asc" ? "desc" : "asc")}
+              className="p-1.5 rounded-md border border-[var(--border-primary)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              title={sortOrder === "asc" ? "Urutan Naik" : "Urutan Turun"}
+            >
+              {sortOrder === "asc" ? "↑" : "↓"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

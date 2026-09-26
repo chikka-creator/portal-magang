@@ -98,12 +98,16 @@ export default function SearchBar({
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => results.length > 0 && setIsOpen(true)}
           placeholder={placeholder}
-          className="w-full pl-10 pr-4 py-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border-primary)] text-xs sm:text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--border-focus)] transition-all"
+          className="w-full pl-9 pr-12 py-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border-primary)] text-xs sm:text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--border-focus)] transition-all shadow-2xs"
         />
-        {isLoading && (
-          <div className="absolute right-3.5 top-1/2 -translate-y-1/2">
+        {isLoading ? (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2">
             <div className="w-3.5 h-3.5 border-2 border-[var(--text-muted)] border-t-[var(--text-primary)] rounded-full animate-spin" />
           </div>
+        ) : (
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-[var(--text-muted)] border border-[var(--border-primary)] px-1 py-0.5 rounded font-mono hidden sm:inline-block">
+            ⌘K
+          </span>
         )}
       </div>
 

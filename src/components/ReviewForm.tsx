@@ -146,13 +146,13 @@ export default function ReviewForm({
       </div>
 
       {errorMessage && (
-        <div className="p-3 rounded-lg bg-red-950/30 border border-red-500/30 text-xs text-red-300">
+        <div className="p-3 rounded-lg bg-[var(--accent-terracotta-bg)] border border-[var(--accent-terracotta)]/30 text-xs text-[var(--accent-terracotta)]">
           {errorMessage}
         </div>
       )}
 
       {successMessage && (
-        <div className="p-3 rounded-lg bg-zinc-800/80 border border-zinc-700/60 text-xs text-zinc-100">
+        <div className="p-3 rounded-lg bg-[var(--accent-sage-bg)] border border-[var(--accent-sage)]/30 text-xs text-[var(--accent-sage)]">
           ✓ {successMessage}
         </div>
       )}
@@ -191,7 +191,7 @@ export default function ReviewForm({
             required
           >
             {companies.map((c) => (
-              <option key={c.id} value={c.id} className="bg-zinc-900 text-zinc-200">
+              <option key={c.id} value={c.id} className="bg-[var(--bg-card)] text-[var(--text-primary)]">
                 {c.name} — {c.city} ({c.industry || "Industri"})
               </option>
             ))}

@@ -1,85 +1,126 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Portal Magang SMK — Modern Minimalist Design System
-   Neutral, high-contrast monochrome & refined slate palette
+   Portal Magang SMK — Lima AI Warm Oatmeal Design System
+   Refined editorial paper aesthetic, muted sage green accents,
+   pitch charcoal contrast & micro-crafted workspace elements
    ============================================================ */
 
 :root {
-  color-scheme: dark;
-  /* Core Palette — Minimalist Dark (Default) */
-  --bg-primary: #09090b;       /* Zinc 950 */
-  --bg-secondary: #121215;     /* Neutral surface */
-  --bg-card: #18181b;          /* Zinc 900 */
-  --bg-card-hover: #222226;    /* Slightly lighter surface */
-  --bg-glass: rgba(24, 24, 27, 0.85);
-  --bg-sidebar: #0e0e11;       /* Deep matte sidebar */
+  color-scheme: light;
 
-  /* Text Colors — Crisp Neutral Hierarchy */
-  --text-primary: #f4f4f5;     /* Zinc 100 */
-  --text-secondary: #a1a1aa;   /* Zinc 400 */
-  --text-muted: #71717a;       /* Zinc 500 */
+  /* Lima AI Warm Oatmeal Palette (Default) */
+  --bg-primary: #F4F1EA;       /* Warm oatmeal / linen canvas */
+  --bg-secondary: #ECE7DE;     /* Warm muted surface */
+  --bg-card: #FFFFFF;          /* Pure white crisp card */
+  --bg-card-hover: #FAF8F4;    /* Light ivory hover */
+  --bg-glass: rgba(255, 255, 255, 0.94);
+  --bg-sidebar: #EFECE5;       /* Warm paper tone sidebar */
 
-  /* Accent — Minimalist Monochrome Contrast */
-  --accent-primary: #ffffff;
-  --accent-primary-hover: #e4e4e7;
-  --accent-secondary: #d4d4d8;
-  --accent-tint: rgba(255, 255, 255, 0.06);
+  /* Navigation & Accents */
+  --bg-active-nav: #DFE6D6;    /* Signature soft sage green pill */
+  --text-active-nav: #1E2B1C;  /* Deep forest charcoal */
+  --accent-sage: #43553E;      /* Moss / forest green accent */
+  --accent-sage-bg: #DFE6D6;   /* Sage pill background */
+  --accent-terracotta: #B85338;/* Rust red status dot */
+  --accent-terracotta-bg: #F9ECE7;
+
+  /* Text Colors — Editorial High Contrast */
+  --text-primary: #18181A;     /* Pitch charcoal black */
+  --text-secondary: #57564F;   /* Warm slate stone */
+  --text-muted: #8C8A82;       /* Refined muted gray */
+
+  /* Button & Interactive Contrasts */
+  --accent-primary: #18181A;   /* Pitch charcoal for primary CTA buttons */
+  --accent-primary-hover: #2E2E2A;
+  --accent-secondary: #3D3D39;
+  --accent-tint: #F5F2EA;      /* Oatmeal highlight */
 
   /* Hairline Borders */
-  --border-primary: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.16);
-  --border-focus: rgba(255, 255, 255, 0.28);
+  --border-primary: #E2DCD1;   /* Delicate warm hairline border */
+  --border-hover: #D3CCC0;
+  --border-focus: #18181A;
 
-  /* Scores — Understated & Clean */
-  --score-excellent: #e4e4e7;
-  --score-good: #d4d4d8;
-  --score-average: #a1a1aa;
-  --score-poor: #71717a;
-  --score-bad: #52525b;
+  /* Scores & Badges */
+  --score-excellent: #2F3E2E;
+  --score-good: #43553E;
+  --score-average: #76746D;
+  --score-poor: #B85338;
+  --score-bad: #8A3721;
 
-  /* Subtle Minimalist Shadows */
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-subtle: 0 8px 30px rgba(0, 0, 0, 0.4);
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(35, 30, 20, 0.04), 0 1px 2px rgba(35, 30, 20, 0.02);
+  --shadow-subtle: 0 8px 30px rgba(35, 30, 20, 0.06);
 
-  /* Radii — Clean & Consistent */
+  /* Radii */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
   --radius-xl: 18px;
 }
 
-/* Light Mode — Crisp Bauhaus / Minimalist White */
+/* Light Theme Alias */
 [data-theme="light"] {
   color-scheme: light;
-  --bg-primary: #fafafa;       /* Zinc 50 */
-  --bg-secondary: #f4f4f5;     /* Zinc 100 */
-  --bg-card: #ffffff;          /* Pure white card */
-  --bg-card-hover: #f8fafc;
-  --bg-glass: rgba(255, 255, 255, 0.9);
-  --bg-sidebar: #f4f4f5;
+  --bg-primary: #F4F1EA;
+  --bg-secondary: #ECE7DE;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FAF8F4;
+  --bg-glass: rgba(255, 255, 255, 0.94);
+  --bg-sidebar: #EFECE5;
+  --bg-active-nav: #DFE6D6;
+  --text-active-nav: #1E2B1C;
+  --accent-sage: #43553E;
+  --accent-sage-bg: #DFE6D6;
+  --accent-terracotta: #B85338;
+  --accent-terracotta-bg: #F9ECE7;
+  --text-primary: #18181A;
+  --text-secondary: #57564F;
+  --text-muted: #8C8A82;
+  --accent-primary: #18181A;
+  --accent-primary-hover: #2E2E2A;
+  --accent-secondary: #3D3D39;
+  --accent-tint: #F5F2EA;
+  --border-primary: #E2DCD1;
+  --border-hover: #D3CCC0;
+  --border-focus: #18181A;
+  --shadow-card: 0 1px 3px rgba(35, 30, 20, 0.04), 0 1px 2px rgba(35, 30, 20, 0.02);
+  --shadow-subtle: 0 8px 30px rgba(35, 30, 20, 0.06);
+}
 
-  --text-primary: #09090b;     /* Zinc 950 */
-  --text-secondary: #52525b;   /* Zinc 600 */
-  --text-muted: #a1a1aa;       /* Zinc 400 */
-
-  --accent-primary: #09090b;
-  --accent-primary-hover: #27272a;
-  --accent-secondary: #3f3f46;
-  --accent-tint: rgba(0, 0, 0, 0.04);
-
-  --border-primary: rgba(0, 0, 0, 0.08);
-  --border-hover: rgba(0, 0, 0, 0.16);
-  --border-focus: rgba(0, 0, 0, 0.3);
-
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
-  --shadow-subtle: 0 12px 30px rgba(0, 0, 0, 0.06);
+/* Dark Mode Option — Warm Charcoal Espresso */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-primary: #151514;
+  --bg-secondary: #1C1C1A;
+  --bg-card: #22221F;
+  --bg-card-hover: #2A2A26;
+  --bg-glass: rgba(34, 34, 31, 0.9);
+  --bg-sidebar: #1A1A18;
+  --bg-active-nav: #2D3929;
+  --text-active-nav: #DFE6D6;
+  --accent-sage: #8EA886;
+  --accent-sage-bg: #2D3929;
+  --accent-terracotta: #E27357;
+  --accent-terracotta-bg: #3B231D;
+  --text-primary: #F4F1EA;
+  --text-secondary: #B2AFA7;
+  --text-muted: #7E7C74;
+  --accent-primary: #F4F1EA;
+  --accent-primary-hover: #E2DCD1;
+  --accent-secondary: #C8C4B8;
+  --accent-tint: rgba(244, 241, 234, 0.06);
+  --border-primary: rgba(244, 241, 234, 0.12);
+  --border-hover: rgba(244, 241, 234, 0.22);
+  --border-focus: #DFE6D6;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-subtle: 0 12px 30px rgba(0, 0, 0, 0.5);
 }
 
 @theme inline {
   --color-background: var(--bg-primary);
   --color-foreground: var(--text-primary);
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
 }
 
@@ -89,7 +130,7 @@
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(161, 161, 170, 0.18) transparent;
+  scrollbar-color: rgba(140, 138, 130, 0.25) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -101,19 +142,19 @@
 }
 
 *::-webkit-scrollbar-thumb {
-  background: rgba(161, 161, 170, 0.18);
+  background: rgba(140, 138, 130, 0.25);
   border-radius: 4px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: rgba(161, 161, 170, 0.35);
+  background: rgba(140, 138, 130, 0.45);
 }
 
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -124,7 +165,7 @@ select, option {
 }
 
 /* ============================================================
-   Minimalist Modern Card
+   Lima AI Modern Card Styling
    ============================================================ */
 
 .glass-card {
@@ -132,38 +173,40 @@ select, option {
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-  transition: border-color 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+  transition: border-color 0.2s ease, transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .glass-card:hover {
   border-color: var(--border-hover);
   background: var(--bg-card-hover);
-  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(35, 30, 20, 0.05);
 }
 
 /* ============================================================
-   Minimalist Button Styles
+   Lima AI Button Styles
    ============================================================ */
 
 .btn-primary {
-  background-color: var(--text-primary);
-  color: var(--bg-primary);
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  background-color: var(--accent-primary);
+  color: #F4F1EA;
+  border: 1px solid var(--accent-primary);
+  border-radius: var(--radius-md);
   padding: 8px 18px;
-  font-weight: 500;
-  font-size: 0.875rem;
+  font-weight: 600;
+  font-size: 0.8125rem;
   letter-spacing: -0.01em;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 .btn-primary:hover {
   opacity: 0.92;
-  transform: translateY(-1px);
+  transform: translateY(-0.5px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
 .btn-primary:active {
@@ -171,25 +214,25 @@ select, option {
 }
 
 .btn-ghost {
-  background: transparent;
-  color: var(--text-secondary);
+  background: var(--bg-card);
+  color: var(--text-primary);
   border: 1px solid var(--border-primary);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   padding: 7px 14px;
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.18s ease;
 }
 
 .btn-ghost:hover {
   background: var(--accent-tint);
-  color: var(--text-primary);
   border-color: var(--border-hover);
+  color: var(--text-primary);
 }
 
 /* ============================================================
-   Minimalist Badge & Pill
+   Lima AI Badges & Chips
    ============================================================ */
 
 .badge-neutral {
@@ -197,13 +240,54 @@ select, option {
   color: var(--text-secondary);
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-sm);
-  padding: 3px 8px;
+  padding: 2.5px 7.5px;
   font-size: 0.75rem;
   font-weight: 500;
 }
 
+.badge-sage {
+  background: var(--accent-sage-bg);
+  color: var(--text-active-nav);
+  border: 1px solid rgba(67, 85, 62, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 2.5px 7.5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-terracotta {
+  background: var(--accent-terracotta-bg);
+  color: var(--accent-terracotta);
+  border: 1px solid rgba(184, 83, 56, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 2.5px 7.5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.pill-chip {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 9999px;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pill-chip:hover {
+  background: var(--accent-tint);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+
 /* ============================================================
-   Photo Grid — Strict 3:4 Aspect Ratio (portrait) as per spec
+   Photo Grid
    ============================================================ */
 
 .photo-grid-item {
@@ -220,15 +304,15 @@ select, option {
 }
 
 /* ============================================================
-   Minimalist Modal Overlay
+   Lima AI Modal Overlay
    ============================================================ */
 
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(24, 24, 26, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: 100;
   display: flex;
   align-items: center;
@@ -237,7 +321,7 @@ select, option {
 }
 
 .modal-content {
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   border: 1px solid var(--border-hover);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-subtle);
@@ -257,7 +341,7 @@ select, option {
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -266,15 +350,15 @@ select, option {
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .skeleton {
   background: linear-gradient(
     90deg,
-    var(--bg-card) 25%,
+    var(--bg-secondary) 25%,
     var(--bg-card-hover) 50%,
-    var(--bg-card) 75%
+    var(--bg-secondary) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.6s infinite ease-in-out;

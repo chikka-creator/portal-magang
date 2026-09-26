@@ -133,7 +133,7 @@ export default function ReviewCard({
 
   return (
     <div
-      className="glass-card p-5 animate-fade-in-up flex flex-col justify-between relative group"
+      className="rounded-xl bg-[var(--bg-card)] border border-[var(--border-primary)] p-4 sm:p-5 animate-fade-in-up flex flex-col justify-between relative group hover:border-[var(--border-hover)] hover:shadow-xs transition-all"
       style={{ animationDelay: `${index * 40}ms`, animationFillMode: "both" }}
     >
       <div>

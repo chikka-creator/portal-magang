@@ -1,15 +1,9 @@
 import { Pool } from "pg";
-
-/**
- * PostgreSQL Database Provider (Vercel-compatible)
- *
- * Uses standard PostgreSQL connection pool only.
- * Schema is initialized inline on first connection (no fs.readFileSync).
- * PGlite fallback removed — production uses hosted PostgreSQL (Neon).
- */
+import { PGlite } from "@electric-sql/pglite";
 
 const globalForDb = globalThis as unknown as {
   pgPool: Pool | undefined;
+  pglite: PGlite | undefined;
   isInitialized: boolean | undefined;
 };
 
@@ -258,8 +252,24 @@ export async function query<T = any>(
   params?: unknown[]
 ): Promise<{ rows: T[]; rowCount: number | null }> {
   const connStr = process.env.DATABASE_URL;
+
+  // Local development fallback to PGlite when no DATABASE_URL is provided
   if (!connStr) {
-    throw new Error("DATABASE_URL is not set. Please configure your PostgreSQL connection string.");
+    if (!globalForDb.pglite) {
+      globalForDb.pglite = new PGlite();
+    }
+    if (!globalForDb.isInitialized) {
+      try {
+        await globalForDb.pglite.exec(SCHEMA_SQL);
+        await globalForDb.pglite.exec(SEED_SQL);
+        globalForDb.isInitialized = true;
+        console.log("[DB] PGlite schema and seed initialized successfully.");
+      } catch (err) {
+        console.error("[DB] Error initializing PGlite schema/seed:", err);
+      }
+    }
+    const result = await globalForDb.pglite.query(text, params as any[]);
+    return { rows: result.rows as T[], rowCount: result.rows.length };
   }
 
   if (!globalForDb.pgPool) {

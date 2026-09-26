@@ -201,7 +201,7 @@ export async function POST(request: NextRequest) {
 
     // Verify company exists
     const companyCheck = await query(
-      `SELECT id FROM companies WHERE id = $1`,
+      `SELECT id, name FROM companies WHERE id = $1`,
       [body.company_id]
     );
     if (companyCheck.rows.length === 0) {

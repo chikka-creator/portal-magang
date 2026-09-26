@@ -13,7 +13,7 @@ function NotifIcon({ type }: { type?: string }) {
   // Reply from company
   if (type?.includes("reply")) {
     return (
-      <span className={base} style={{ background: "rgba(34,197,94,0.12)", color: "#4ade80", border: "1px solid rgba(34,197,94,0.2)" }}>
+      <span className={base + " bg-[var(--accent-tint)] text-[var(--text-secondary)] border border-[var(--border-primary)]"} >
         <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
         </svg>
@@ -24,7 +24,7 @@ function NotifIcon({ type }: { type?: string }) {
   // Helpful vote / upvote
   if (type?.includes("vote") || type?.includes("helpful")) {
     return (
-      <span className={base} style={{ background: "rgba(245,158,11,0.12)", color: "#fbbf24", border: "1px solid rgba(245,158,11,0.2)" }}>
+      <span className={base + " bg-[var(--accent-tint)] text-[var(--text-secondary)] border border-[var(--border-primary)]"} >
         <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
         </svg>
@@ -35,7 +35,7 @@ function NotifIcon({ type }: { type?: string }) {
   // Claim or verification
   if (type?.includes("claim") || type?.includes("verify")) {
     return (
-      <span className={base} style={{ background: "rgba(168,85,247,0.12)", color: "#c084fc", border: "1px solid rgba(168,85,247,0.2)" }}>
+      <span className={base + " bg-[var(--accent-tint)] text-[var(--text-secondary)] border border-[var(--border-primary)]"} >
         <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
         </svg>
@@ -46,7 +46,7 @@ function NotifIcon({ type }: { type?: string }) {
   // Flag or moderation
   if (type?.includes("flag") || type?.includes("report")) {
     return (
-      <span className={base} style={{ background: "rgba(239,68,68,0.12)", color: "#f87171", border: "1px solid rgba(239,68,68,0.2)" }}>
+      <span className={base + " bg-[var(--accent-tint)] text-[var(--text-secondary)] border border-[var(--border-primary)]"} >
         <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
@@ -57,7 +57,7 @@ function NotifIcon({ type }: { type?: string }) {
   // Review or feedback
   if (type?.includes("review")) {
     return (
-      <span className={base} style={{ background: "rgba(59,130,246,0.12)", color: "#60a5fa", border: "1px solid rgba(59,130,246,0.2)" }}>
+      <span className={base + " bg-[var(--accent-tint)] text-[var(--text-secondary)] border border-[var(--border-primary)]"} >
         <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
         </svg>
@@ -67,7 +67,7 @@ function NotifIcon({ type }: { type?: string }) {
 
   // Default Info
   return (
-    <span className={base} style={{ background: "var(--accent-tint)", color: "var(--text-secondary)", border: "1px solid var(--border-primary)" }}>
+    <span className={base + " bg-[var(--accent-tint)] text-[var(--text-muted)] border border-[var(--border-primary)]"} >
       <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
@@ -211,20 +211,20 @@ export default function NotificationBell() {
           />
 
           <div
-            className="fixed top-16 left-3 right-3 sm:absolute sm:top-full sm:left-0 sm:right-auto sm:mt-2.5 w-auto sm:w-[380px] max-w-[calc(100vw-24px)] rounded-2xl border border-[var(--border-hover)] bg-[var(--bg-card)] dark:bg-[#18181b] bg-white shadow-2xl z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150"
+            className="fixed top-16 left-3 right-3 sm:absolute sm:top-full sm:left-0 sm:right-auto sm:mt-2.5 w-auto sm:w-[380px] max-w-[calc(100vw-24px)] rounded-2xl border border-[var(--border-hover)] bg-[var(--bg-card)] shadow-2xl z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150"
             style={{
               boxShadow: "0 25px 50px -12px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08)",
             }}
           >
             {/* Header */}
-            <div className="p-3.5 border-b border-[var(--border-primary)] bg-[var(--bg-secondary)] dark:bg-[#121215] bg-zinc-50">
+            <div className="p-3.5 border-b border-[var(--border-primary)] bg-[var(--bg-secondary)]">
             <div className="flex items-center justify-between mb-2.5">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-xs tracking-tight text-[var(--text-primary)]">
                   Pusat Notifikasi
                 </span>
                 {unreadCount > 0 && (
-                  <span className="px-2 py-0.5 rounded-full text-[10.5px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  <span className="px-2 py-0.5 rounded-full text-[10.5px] font-medium bg-[var(--accent-tint)] text-[var(--text-primary)] border border-[var(--border-hover)]">
                     {unreadCount} baru
                   </span>
                 )}
@@ -241,7 +241,7 @@ export default function NotificationBell() {
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex items-center gap-1.5 p-1 rounded-lg bg-[var(--bg-card)] border border-[var(--border-primary)]">
+            <div className="flex items-center gap-1.5 p-1 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-primary)]">
               <button
                 onClick={() => setFilterTab("all")}
                 className={`flex-1 py-1 px-2.5 rounded-md text-[11px] font-medium transition-all ${
@@ -294,13 +294,13 @@ export default function NotificationBell() {
                     onClick={() => !n.is_read && markAsRead(n.id)}
                     className={`group relative p-3.5 transition-all duration-150 flex gap-3 items-start cursor-pointer ${
                       n.is_read
-                        ? "bg-transparent hover:bg-[var(--accent-tint)]/50 opacity-75 hover:opacity-100"
-                        : "bg-blue-500/[0.04] hover:bg-blue-500/[0.08]"
+                        ? "bg-transparent hover:bg-[var(--accent-tint)] opacity-75 hover:opacity-100"
+                        : "bg-[var(--accent-tint)] hover:bg-[var(--bg-card-hover)]"
                     }`}
                   >
                     {/* Unread Glow Dot */}
                     {!n.is_read && (
-                      <span className="absolute top-4 left-1.5 w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+                      <span className="absolute top-4 left-1.5 w-1.5 h-1.5 rounded-full bg-[var(--text-primary)] shadow-[0_0_6px_rgba(244,244,245,0.5)]" />
                     )}
 
                     {/* Icon by Type */}
@@ -337,7 +337,7 @@ export default function NotificationBell() {
                               e.stopPropagation();
                               setIsOpen(false);
                             }}
-                            className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-400 hover:text-blue-300 transition-colors"
+                            className="inline-flex items-center gap-1 text-[11px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                           >
                             <span>Lihat rincian</span>
                             <svg className="w-3 h-3 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -365,7 +365,7 @@ export default function NotificationBell() {
           </div>
 
           {/* Footer */}
-          <div className="p-2.5 border-t border-[var(--border-primary)] bg-[var(--bg-secondary)] dark:bg-[#121215] bg-zinc-50 flex items-center justify-between text-[11px] text-[var(--text-muted)] px-3.5">
+          <div className="p-2.5 border-t border-[var(--border-primary)] bg-[var(--bg-secondary)] flex items-center justify-between text-[11px] text-[var(--text-muted)] px-3.5">
             <span>
               {notifications.filter((n) => n.is_read).length} dari {notifications.length} ulasan/tanggapan dibaca
             </span>

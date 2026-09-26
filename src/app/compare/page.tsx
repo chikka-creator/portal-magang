@@ -18,7 +18,7 @@ export default function ComparePage() {
         const res = await fetch("/api/companies");
         if (res.ok) {
           const data = await res.json();
-          const list = data.companies || [];
+          const list = data.data || [];
           setAllCompanies(list);
 
           if (compareList.length > 0) {

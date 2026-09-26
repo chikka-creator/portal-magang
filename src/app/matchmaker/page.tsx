@@ -119,8 +119,8 @@ export default function MatchmakerPage() {
                   onClick={() => setSelectedMajor(m.id)}
                   className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center gap-3 ${
                     selectedMajor === m.id
-                      ? "border-blue-500 bg-blue-500/10 shadow-xs"
-                      : "border-[var(--border-primary)] bg-[var(--bg-secondary)] hover:border-[var(--border-hover)]"
+                      ? "border-[var(--accent-sage)] bg-[var(--bg-active-nav)] shadow-2xs"
+                      : "border-[var(--border-primary)] bg-[var(--bg-card)] hover:border-[var(--border-hover)]"
                   }`}
                 >
                   <span className="text-2xl">{m.icon}</span>
@@ -132,7 +132,7 @@ export default function MatchmakerPage() {
             <div className="flex justify-end pt-4">
               <button
                 onClick={() => setStep(2)}
-                className="px-5 py-2.5 rounded-xl bg-[var(--accent-primary)] text-[var(--bg-primary)] font-semibold text-xs hover:opacity-90 transition-opacity flex items-center gap-1.5"
+                className="btn-primary"
               >
                 <span>Lanjut ke Prioritas →</span>
               </button>
@@ -157,8 +157,8 @@ export default function MatchmakerPage() {
                   onClick={() => setSelectedPriority(p.id)}
                   className={`p-4 rounded-xl border cursor-pointer transition-all flex items-start justify-between ${
                     selectedPriority === p.id
-                      ? "border-purple-500 bg-purple-500/10 shadow-xs"
-                      : "border-[var(--border-primary)] bg-[var(--bg-secondary)] hover:border-[var(--border-hover)]"
+                      ? "border-[var(--accent-sage)] bg-[var(--bg-active-nav)] shadow-2xs"
+                      : "border-[var(--border-primary)] bg-[var(--bg-card)] hover:border-[var(--border-hover)]"
                   }`}
                 >
                   <div>
@@ -166,7 +166,7 @@ export default function MatchmakerPage() {
                     <p className="text-[11px] text-[var(--text-muted)] mt-0.5">{p.desc}</p>
                   </div>
                   <span className={`w-4 h-4 rounded-full border flex items-center justify-center text-[10px] ${
-                    selectedPriority === p.id ? "border-purple-400 bg-purple-500 text-white" : "border-[var(--border-primary)]"
+                    selectedPriority === p.id ? "border-[var(--accent-sage)] bg-[var(--accent-sage)] text-white" : "border-[var(--border-primary)]"
                   }`}>
                     {selectedPriority === p.id && "✓"}
                   </span>

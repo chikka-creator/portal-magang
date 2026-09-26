@@ -115,8 +115,8 @@ export default function CompaniesPage() {
                   onClick={() => setShowFilters(!showFilters)}
                   className={`p-2.5 rounded-lg border text-xs font-medium flex items-center gap-1.5 transition-colors ${
                     showFilters || minStipend > 0 || minRating > 0
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-card text-muted-foreground border-border hover:text-foreground"
+                      ? "bg-[var(--accent-primary)] text-[var(--bg-primary)] border-[var(--accent-primary)]"
+                      : "bg-[var(--bg-card)] text-[var(--text-secondary)] border-[var(--border-primary)] hover:text-[var(--text-primary)]"
                   }`}
                   title="Filter Lanjutan"
                 >

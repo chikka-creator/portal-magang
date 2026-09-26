@@ -196,7 +196,7 @@ export default function AdminSidebar({
         className={`
           fixed lg:static inset-y-0 left-0 z-40
           w-64 flex-shrink-0 flex flex-col justify-between
-          bg-[var(--bg-card)] border-r border-[var(--border-primary)]
+          bg-[var(--bg-sidebar)] border-r border-[var(--border-primary)]
           p-4 transition-transform duration-200 overflow-y-auto
           ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
@@ -205,13 +205,13 @@ export default function AdminSidebar({
           {/* Header */}
           <div className="px-2 pt-2">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
-              <h2 className="text-sm font-bold tracking-tight text-[var(--text-primary)]">
-                Admin Control Center
+              <span className="text-[var(--text-primary)] text-sm">✳</span>
+              <h2 className="text-xs font-bold tracking-wider uppercase text-[var(--text-primary)]">
+                Admin Studio
               </h2>
             </div>
             <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-              Portal Magang SMK v2.0
+              Portal Magang SMK Surabaya
             </p>
           </div>
 
@@ -219,8 +219,9 @@ export default function AdminSidebar({
           <nav className="space-y-4">
             {navGroups.map((grp, idx) => (
               <div key={idx} className="space-y-1">
-                <div className="px-2 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                  {grp.group}
+                <div className="px-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
+                  <span className="text-[7px]">■</span>
+                  <span>{grp.group}</span>
                 </div>
                 <div className="space-y-0.5">
                   {grp.items.map((item) => {
@@ -237,7 +238,7 @@ export default function AdminSidebar({
                           transition-colors duration-150
                           ${
                             active
-                              ? "bg-[var(--accent-tint)] text-[var(--text-primary)] border border-[var(--border-hover)] shadow-xs"
+                              ? "bg-[var(--bg-active-nav)] text-[var(--text-active-nav)] font-semibold shadow-2xs"
                               : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--accent-tint)]"
                           }
                         `}

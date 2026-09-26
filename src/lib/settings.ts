@@ -4,6 +4,9 @@ import { query } from "@/lib/db";
  * Get a single platform setting value by key
  */
 export async function getPlatformSetting(key: string, defaultValue = ""): Promise<string> {
+  if (!process.env.DATABASE_URL) {
+    return defaultValue;
+  }
   try {
     const result = await query(
       `SELECT value FROM platform_settings WHERE key = $1 LIMIT 1`,

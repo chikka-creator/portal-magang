@@ -18,7 +18,7 @@ export default function BookmarksPage() {
         const res = await fetch("/api/companies");
         if (res.ok) {
           const data = await res.json();
-          const all = data.companies || [];
+          const all = data.data || [];
           const filtered = all.filter((c: any) => bookmarks.includes(c.id));
           setCompanies(filtered);
         }
