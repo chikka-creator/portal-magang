@@ -157,6 +157,19 @@ CREATE TABLE IF NOT EXISTS platform_settings (
     updated_at      TIMESTAMP       DEFAULT CURRENT_TIMESTAMP,
     updated_by      UUID            REFERENCES admin_users(id) ON DELETE SET NULL
 );
+
+CREATE TABLE IF NOT EXISTS upcoming_events (
+    id              UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
+    title           VARCHAR(200)    NOT NULL,
+    description     TEXT,
+    event_time      TIMESTAMP       NOT NULL,
+    event_type      VARCHAR(20)     DEFAULT 'task',
+    location        VARCHAR(200),
+    is_active       BOOLEAN         DEFAULT TRUE,
+    created_at      TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_events_time ON upcoming_events(event_time);
+CREATE INDEX IF NOT EXISTS idx_events_active ON upcoming_events(is_active, event_time);
 `;
 
 const SEED_SQL = `
@@ -226,6 +239,13 @@ INSERT INTO platform_settings (key, value, label, description, setting_type) VAL
 ('site_name', 'Portal Magang SMK Surabaya', 'Nama Situs', 'Nama yang tampil di header portal', 'text'),
 ('max_reviews_per_student', '5', 'Maks Ulasan Per Siswa', 'Jumlah maksimal ulasan yang bisa ditulis satu siswa', 'number')
 ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO upcoming_events (title, description, event_time, event_type, location) VALUES
+('Batch Pendaftaran Magang Gasik (RPL & TKJ)', 'Pendaftaran magang periode Oktober-Desember dibuka untuk jurusan RPL dan TKJ', CURRENT_TIMESTAMP + INTERVAL '2 hours', 'meet', 'Google Meet'),
+('Q&A Mentor Industri: BUMN & Perkapalan', 'Sesi tanya jawab dengan mentor dari PT PAL dan PT Telkom', CURRENT_TIMESTAMP + INTERVAL '5 hours 30 minutes', 'meet', 'Zoom Live'),
+('Batas Akhir Unggah Laporan Mingguan PKL', 'Deadline pengumpulan laporan mingguan periode ini', CURRENT_TIMESTAMP + INTERVAL '8 hours', 'deadline', 'Portal Magang'),
+('Workshop Penulisan CV & Resume', 'Pelatihan penulisan CV profesional untuk persiapan melamar magang', CURRENT_TIMESTAMP + INTERVAL '2 days', 'meet', 'Ruang Workshop Lt.3')
+ON CONFLICT DO NOTHING;
 `;
 
 async function ensureSchema(pool: Pool) {

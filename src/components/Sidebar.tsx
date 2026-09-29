@@ -213,6 +213,11 @@ export default function Sidebar() {
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && searchQuery.trim()) {
+                    window.location.href = `/companies?search=${encodeURIComponent(searchQuery.trim())}`;
+                  }
+                }}
                 className="w-full pl-8 pr-8 py-1.5 rounded-md bg-[var(--bg-card)] border border-[var(--border-primary)] text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--border-focus)] transition-all"
               />
               <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-[var(--text-muted)] border border-[var(--border-primary)] px-1 py-0.2 rounded font-mono">

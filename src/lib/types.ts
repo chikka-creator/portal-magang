@@ -203,3 +203,35 @@ export interface AnalyticsData {
 export type ReviewSortField = "created_at" | "environment_score" | "mentorship_score" | "stipend_amount" | "helpful_count";
 export type SortOrder = "asc" | "desc";
 
+export interface UpcomingEvent {
+  id: string;
+  title: string;
+  description: string | null;
+  event_time: string;
+  event_type: "meet" | "task" | "deadline";
+  location: string | null;
+  is_active: boolean;
+}
+
+export interface AiBriefing {
+  topIndustry: string;
+  topIndustryScore: number;
+  avgStipend: number;
+  totalReviews: number;
+  recentReviewCount: number;
+  generatedText: string;
+}
+
+export interface AiSearchResult {
+  id: string;
+  name: string;
+  city: string;
+  industry: string | null;
+  avg_stipend: number;
+  avg_environment: number;
+  avg_mentorship: number;
+  review_count: number;
+  confidence: number;
+  matchReasons: string[];
+}
+
