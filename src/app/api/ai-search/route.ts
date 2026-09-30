@@ -121,8 +121,9 @@ Balas HANYA dengan satu objek JSON (tanpa markdown, tanpa teks lain):
 Aturan intent:
 - "tasks": user menanyakan tugas/jadwal/rencananya sendiri ("rencana saya", "tugas hari ini", "todo", "pekerjaan saya").
 - "summary": user minta ringkasan/ikhtisar/statistik ("ringkasan", "summary", "statistik", "gambaran umum").
-- "reviews": user minta pengalaman/ulasan/opini siswa ("ulasan", "review", "pengalaman", "cerita").
+- "reviews": user minta pengalaman/ulasan/opini siswa ("ulasan", "review", "pengalaman", "cerita", "kata siswa").
 - "companies": default — mencari/memfilter perusahaan magang.
+Contoh: "pengalaman siswa soal mentor" → reviews; "rencana magang saya hari ini" → tasks; "ringkasan uang saku" → summary; "magang teknologi Surabaya" → companies.
 Aturan filters:
 - industries hanya dari: Teknologi, Telekomunikasi, Manufaktur, Perkapalan & Pertahanan, Logistik & Maritim, Konstruksi & Material, Kimia & Industri, Akuntansi, Pemasaran. Selain itu [].
 - cities hanya: Surabaya, Gresik, Sidoarjo. Selain itu [].
@@ -167,6 +168,16 @@ function sanitizeFilters(raw: unknown): ParsedFilters {
 function sanitizeIntent(v: unknown): Intent {
   const s = asString(v);
   return (INTENTS as string[]).includes(s) ? (s as Intent) : "companies";
+}
+
+// Deterministic override — kerehore routes to random upstreams, so LLM intent
+// alone is flaky for obvious queries. ponytail: keywords > LLM, keep list short.
+function guessIntent(raw: string): Intent | null {
+  const q = raw.toLowerCase();
+  if (/(ringkasan|summary|ikhtisar|statistik|gambaran umum|rekap)/.test(q)) return "summary";
+  if (/(rencana|tugas|todo|jadwal)/.test(q) && /(saya|aku|hari ini|saya hari)/.test(q)) return "tasks";
+  if (/(pengalaman|ulasan|review|opini|testimoni|kata siswa|cerita)/.test(q)) return "reviews";
+  return null;
 }
 
 async function llmParse(rawQuery: string): Promise<{
@@ -458,9 +469,10 @@ export async function POST(req: NextRequest) {
     }
 
     const parsed = await llmParse(rawQuery);
-    const intent: Intent = parsed?.intent ?? "companies";
+    const llmIntent = parsed?.intent ?? "companies";
+    const intent: Intent = guessIntent(rawQuery) ?? llmIntent;
     const filters = parsed ? parsed.filters : parseQuery(rawQuery);
-    let answer = parsed?.answer ?? null;
+    let answer = intent !== llmIntent ? null : (parsed?.answer ?? null);
     let data: Record<string, unknown>[] = [];
 
     if (intent === "tasks") {

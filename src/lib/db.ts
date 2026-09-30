@@ -276,19 +276,13 @@ async function ensureSchema(pool: Pool) {
   if (globalForDb.isInitialized) return;
 
   try {
-    const check = await pool.query(
-      "SELECT to_regclass('public.platform_settings') as tbl"
-    );
-    if (!check.rows[0]?.tbl) {
-      console.log("[DB] Initializing schema and seed data...");
-      await pool.query(SCHEMA_SQL);
-      await pool.query(SEED_SQL);
-      console.log("[DB] Schema & seed successfully initialized.");
-    }
-    globalForDb.isInitialized = true;
+    await pool.query(SCHEMA_SQL);
+    await pool.query(SEED_SQL);
+    console.log("[DB] Schema & seed verified.");
   } catch (err) {
     console.error("[DB] Error initializing schema:", err);
   }
+  globalForDb.isInitialized = true;
 }
 
 export async function query<T = any>(
