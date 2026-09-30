@@ -43,6 +43,7 @@ export default function DashboardPage() {
   const [todayCompanies, setTodayCompanies] = useState<Company[]>([]);
   const [upcomingCompanies, setUpcomingCompanies] = useState<Company[]>([]);
   const [completedCompanies, setCompletedCompanies] = useState<Company[]>([]);
+  const [todoCompanies, setTodoCompanies] = useState<Set<string>>(new Set());
   const [isListening, setIsListening] = useState(false);
   const aiSearchRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
@@ -82,12 +83,12 @@ export default function DashboardPage() {
     try {
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
-      const todayEnd = new Date();
-      todayEnd.setHours(23, 59, 59, 999);
+      const weekStart = new Date();
+      weekStart.setDate(weekStart.getDate() - 7);
 
       const [todayRes, upcomingRes, completedRes] = await Promise.all([
         fetch(`/api/reviews?sort=created_at&order=desc&limit=5`),
-        fetch(`/api/reviews?sort=created_at&order=desc&limit=5`),
+        fetch(`/api/reviews?sort=created_at&order=desc&limit=10`),
         fetch(`/api/companies?sort_by=reviews&sort_order=desc&limit=5`),
       ]);
 
@@ -98,17 +99,25 @@ export default function DashboardPage() {
       ]);
 
       if (todayJson.success) {
-        const todayCompanyIds = new Set(todayJson.data.map((r: any) => r.company_id));
+        const todayReviews = todayJson.data.filter((r: ReviewPublic) => {
+          const d = new Date(r.created_at);
+          return d >= todayStart;
+        });
+        const todayCompanyIds = new Set(todayReviews.map((r: any) => r.company_id));
         const uniqueToday = trending.filter(c => todayCompanyIds.has(c.id));
-        setTodayCompanies(uniqueToday.length > 0 ? uniqueToday.slice(0, 3) : trending.slice(0, 3));
+        setTodayCompanies(uniqueToday.length > 0 ? uniqueToday.slice(0, 5) : trending.slice(0, 3));
       }
       if (upcomingJson.success) {
-        const recentCompanyIds = new Set(upcomingJson.data.slice(0, 5).map((r: any) => r.company_id));
-        const uniqueUpcoming = trending.filter(c => recentCompanyIds.has(c.id));
-        setUpcomingCompanies(uniqueUpcoming.length > 0 ? uniqueUpcoming.slice(0, 3) : trending.slice(0, 3));
+        const upcomingReviews = upcomingJson.data.filter((r: ReviewPublic) => {
+          const d = new Date(r.created_at);
+          return d < todayStart && d >= weekStart;
+        });
+        const upcomingCompanyIds = new Set(upcomingReviews.map((r: any) => r.company_id));
+        const uniqueUpcoming = trending.filter(c => upcomingCompanyIds.has(c.id));
+        setUpcomingCompanies(uniqueUpcoming.length > 0 ? uniqueUpcoming.slice(0, 5) : trending.slice(0, 3));
       }
       if (completedJson.success) {
-        setCompletedCompanies(completedJson.data.slice(0, 3));
+        setCompletedCompanies(completedJson.data.slice(0, 5));
       }
     } catch (err) {
       console.error("Failed to load todo companies:", err);
@@ -188,6 +197,18 @@ export default function DashboardPage() {
 
     recognition.start();
     setIsListening(true);
+  };
+
+  const toggleTodo = (companyId: string) => {
+    setTodoCompanies(prev => {
+      const next = new Set(prev);
+      if (next.has(companyId)) {
+        next.delete(companyId);
+      } else {
+        next.add(companyId);
+      }
+      return next;
+    });
   };
 
   const getTabCompanies = () => {
@@ -525,9 +546,10 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-3 min-w-0">
                         <input
                           type="checkbox"
-                          defaultChecked={idx === 0 && selectedDayTab === "today"}
-                          className="w-4 h-4 rounded border-[var(--border-primary)] text-[var(--accent-primary)] focus:ring-0 accent-[#18181A]"
+                          checked={todoCompanies.has(comp.id)}
+                          onChange={() => toggleTodo(comp.id)}
                           onClick={(e) => e.stopPropagation()}
+                          className="w-4 h-4 rounded border-[var(--border-primary)] text-[var(--accent-primary)] focus:ring-0 accent-[#18181A]"
                         />
                         <span className={`w-2 h-2 rounded-full flex-shrink-0 ${idx === 0 ? "bg-[#B85338]" : idx === 1 ? "bg-[#43553E]" : "bg-[#76746D]"}`} />
                         <span className="text-xs sm:text-sm font-medium text-[var(--text-primary)] truncate group-hover:underline">
@@ -679,7 +701,7 @@ export default function DashboardPage() {
 
                 <div className="pt-2 border-t border-[var(--border-primary)]">
                   <Link
-                    href="/companies"
+                    href="/analytics"
                     className="inline-flex items-center gap-1 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-medium transition-colors"
                   >
                     <span>View calendar</span>

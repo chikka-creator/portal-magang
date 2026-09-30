@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     const result = await query(
       `SELECT id, title, description, event_time, event_type, location, is_active
        FROM upcoming_events
-       WHERE is_active = TRUE AND event_time >= NOW() - INTERVAL '1 hour'
+       WHERE is_active = TRUE AND event_time >= NOW()
        ORDER BY event_time ASC
        LIMIT $1`,
       [limit]
