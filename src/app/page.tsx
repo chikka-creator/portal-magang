@@ -41,6 +41,8 @@ export default function DashboardPage() {
   const [aiSearchResults, setAiSearchResults] = useState<AiSearchResult[]>([]);
   const [aiSearchOpen, setAiSearchOpen] = useState(false);
   const [aiSearchLoading, setAiSearchLoading] = useState(false);
+  const [aiAnswer, setAiAnswer] = useState<string | null>(null);
+  const [aiIntent, setAiIntent] = useState<string>("companies");
   const [userTasks, setUserTasks] = useState<UserTask[]>([]);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -164,18 +166,25 @@ export default function DashboardPage() {
     handleAiSearch(promptText);
   };
 
-  const handleAiSearch = async (query: string) => {
-    if (!query.trim()) return;
+  const handleAiSearch = async (searchQuery: string) => {
+    if (!searchQuery.trim()) return;
     setAiSearchLoading(true);
     setAiSearchOpen(true);
+    setAiAnswer(null);
+    setAiIntent("companies");
     try {
+      const studentHash = localStorage.getItem("student_hash") || "hash_demo_student";
       const res = await fetch("/api/ai-search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query: searchQuery, student_hash: studentHash }),
       });
       const data = await res.json();
-      if (data.success) setAiSearchResults(data.data);
+      if (data.success) {
+        setAiSearchResults(data.data || []);
+        setAiAnswer(typeof data.answer === "string" && data.answer ? data.answer : null);
+        setAiIntent(typeof data.intent === "string" ? data.intent : "companies");
+      }
     } catch (err) {
       console.error("AI search failed:", err);
     } finally {
@@ -372,43 +381,76 @@ export default function DashboardPage() {
                 {aiSearchLoading ? (
                   <div className="flex items-center justify-center py-6 gap-2">
                     <div className="w-4 h-4 border-2 border-[var(--text-muted)] border-t-[var(--accent-primary)] rounded-full animate-spin" />
-                    <span className="text-xs text-[var(--text-muted)]">Mencari perusahaan terbaik...</span>
-                  </div>
-                ) : aiSearchResults.length === 0 ? (
-                  <div className="py-6 text-center">
-                    <p className="text-xs text-[var(--text-muted)]">Tidak ditemukan perusahaan yang cocok.</p>
+                    <span className="text-xs text-[var(--text-muted)]">Lima sedang berpikir...</span>
                   </div>
                 ) : (
                   <>
-                    <p className="text-[11px] text-[var(--text-muted)] font-medium">{aiSearchResults.length} perusahaan ditemukan</p>
-                    {aiSearchResults.map((r) => (
-                      <Link
-                        key={r.id}
-                        href={`/companies/${r.id}`}
-                        className="block p-2.5 rounded-lg hover:bg-[var(--accent-tint)] transition-colors"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="min-w-0">
-                            <p className="text-xs sm:text-sm font-medium text-[var(--text-primary)] truncate">{r.name}</p>
-                            <p className="text-[11px] text-[var(--text-muted)]">{r.city} · {r.industry}</p>
-                          </div>
-                          <div className="text-right flex-shrink-0 ml-2">
-                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]">
-                              {r.confidence}%
-                            </span>
-                          </div>
-                        </div>
-                        {r.matchReasons.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1.5">
-                            {r.matchReasons.slice(0, 3).map((reason, i) => (
-                              <span key={i} className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--bg-secondary)] text-[var(--text-muted)]">
-                                {reason}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </Link>
-                    ))}
+                    {aiAnswer && (
+                      <div className="rounded-lg border-l-2 border-[var(--accent-primary)] bg-[var(--accent-tint)] px-3 py-2 space-y-1">
+                        <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--accent-primary)]">Lima</p>
+                        <p className="text-xs sm:text-sm leading-relaxed text-[var(--text-primary)]">{aiAnswer}</p>
+                      </div>
+                    )}
+                    {aiSearchResults.length > 0 && (
+                      <>
+                        <p className="text-[11px] text-[var(--text-muted)] font-medium">
+                          {aiSearchResults.length}{" "}
+                          {aiIntent === "tasks" ? "tugas" : aiIntent === "reviews" ? "ulasan" : "perusahaan"} ditemukan
+                        </p>
+                        {aiSearchResults.map((r, i) => {
+                          const card = (
+                            <>
+                              <div className="flex items-center justify-between">
+                                <div className="min-w-0">
+                                  <p className="text-xs sm:text-sm font-medium text-[var(--text-primary)] truncate">{r.name}</p>
+                                  <p className="text-[11px] text-[var(--text-muted)]">{r.city} · {r.industry}</p>
+                                </div>
+                                <div className="text-right flex-shrink-0 ml-2">
+                                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]">
+                                    {r.confidence}%
+                                  </span>
+                                </div>
+                              </div>
+                              {r.matchReasons.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-1.5">
+                                  {r.matchReasons.slice(0, 3).map((reason, i) => (
+                                    <span key={i} className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--bg-secondary)] text-[var(--text-muted)]">
+                                      {reason}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </>
+                          );
+                          return aiIntent === "tasks" ? (
+                            <div key={`${r.id}-${i}`} className="p-2.5 rounded-lg bg-[var(--bg-secondary)]">
+                              {card}
+                            </div>
+                          ) : (
+                            <Link
+                              key={`${r.id}-${i}`}
+                              href={`/companies/${r.id}`}
+                              className="block p-2.5 rounded-lg hover:bg-[var(--accent-tint)] transition-colors"
+                            >
+                              {card}
+                            </Link>
+                          );
+                        })}
+                      </>
+                    )}
+                    {!aiAnswer && aiSearchResults.length === 0 && (
+                      <div className="py-6 text-center">
+                        <p className="text-xs text-[var(--text-muted)]">
+                          {aiIntent === "tasks"
+                            ? "Belum ada tugas yang cocok."
+                            : aiIntent === "reviews"
+                            ? "Belum ada ulasan yang cocok."
+                            : aiIntent === "summary"
+                            ? "Ringkasan tidak tersedia."
+                            : "Tidak ditemukan perusahaan yang cocok."}
+                        </p>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
