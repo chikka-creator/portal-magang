@@ -173,7 +173,7 @@ export default function Sidebar() {
           bg-[var(--bg-sidebar)] border-r border-[var(--border-primary)]
           flex flex-col justify-between
           transition-transform duration-200 ease-out
-          lg:translate-x-0 lg:relative lg:z-40
+          lg:translate-x-0 lg:relative lg:z-[60]
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >

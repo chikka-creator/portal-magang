@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { formatRelativeTime } from "@/lib/format";
 
@@ -85,6 +86,20 @@ export default function NotificationBell() {
   const [filterTab, setFilterTab] = useState<"all" | "unread">("all");
   const [isWiggling, setIsWiggling] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [panelPos, setPanelPos] = useState<{ top: number; left: number; width: number } | null>(null);
+
+  const positionPanel = useCallback(() => {
+    const el = dropdownRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const width = Math.min(380, window.innerWidth - 24);
+    setPanelPos({
+      top: r.bottom + 10,
+      width,
+      left: Math.max(8, Math.min(r.left, window.innerWidth - width - 8)),
+    });
+  }, []);
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -114,16 +129,34 @@ export default function NotificationBell() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Close on outside click
+  // Close on outside click (panel is portaled to body, check it too)
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      const t = e.target as Node;
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(t) &&
+        panelRef.current &&
+        !panelRef.current.contains(t)
+      ) {
         setIsOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Keep panel glued to bell on scroll/resize (bell scrolls with page)
+  useEffect(() => {
+    if (!isOpen) return;
+    const update = () => positionPanel();
+    window.addEventListener("scroll", update);
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [isOpen, positionPanel]);
 
   // Mark single item as read
   const markAsRead = async (id: string, e?: React.MouseEvent) => {
@@ -167,7 +200,10 @@ export default function NotificationBell() {
     <div className="relative inline-block" ref={dropdownRef}>
       {/* ──────────────── Trigger Button ──────────────── */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          if (!isOpen) positionPanel();
+          setIsOpen(!isOpen);
+        }}
         aria-label="Pusat Notifikasi"
         className={`relative flex items-center justify-center w-9 h-9 rounded-xl border transition-all duration-200 outline-none ${
           isOpen
@@ -201,20 +237,20 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {/* ──────────────── Dropdown Panel ──────────────── */}
-      {isOpen && (
-        <>
-          {/* Mobile backdrop to dismiss dropdown cleanly */}
+      {/* ──────────────── Dropdown Panel (portaled to body: floats above everything) ──────────────── */}
+      {isOpen &&
+        panelPos &&
+        createPortal(
           <div
-            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs sm:hidden"
-            onClick={() => setIsOpen(false)}
-          />
-
-          <div
-            className="fixed top-16 left-3 right-3 sm:absolute sm:top-full sm:left-0 sm:right-auto sm:mt-2.5 w-auto sm:w-[380px] max-w-[calc(100vw-24px)] rounded-2xl border border-[var(--border-hover)] bg-[var(--bg-card)] shadow-2xl z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150"
+            ref={panelRef}
+            data-testid="notif-panel"
             style={{
+              top: panelPos.top,
+              left: panelPos.left,
+              width: panelPos.width,
               boxShadow: "0 25px 50px -12px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08)",
             }}
+            className="fixed z-[70] rounded-2xl border border-[var(--border-hover)] bg-[var(--bg-card)] shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150"
           >
             {/* Header */}
             <div className="p-3.5 border-b border-[var(--border-primary)] bg-[var(--bg-secondary)]">
@@ -371,9 +407,9 @@ export default function NotificationBell() {
             </span>
             <span className="text-[10px] font-mono opacity-75">Auto-refresh</span>
           </div>
-        </div>
-        </>
-      )}
+          </div>,
+          document.body
+        )}
 
       {/* Animation Style */}
       <style jsx global>{`
