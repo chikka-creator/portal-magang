@@ -18,6 +18,24 @@ CREATE TABLE IF NOT EXISTS companies (
 CREATE INDEX IF NOT EXISTS idx_companies_city ON companies(city);
 CREATE INDEX IF NOT EXISTS idx_companies_industry ON companies(industry);
 
+CREATE TABLE IF NOT EXISTS user_tasks (
+    id                  UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
+    student_hash        VARCHAR(255)    NOT NULL,
+    title               VARCHAR(200)    NOT NULL,
+    company_id          UUID            NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    description         TEXT,
+    status              VARCHAR(20)     NOT NULL DEFAULT 'pending',
+    due_date            TIMESTAMP,
+    completed_at        TIMESTAMP,
+    created_at          TIMESTAMP       DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMP       DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_task_per_student UNIQUE (student_hash, title)
+);
+CREATE INDEX IF NOT EXISTS idx_tasks_student ON user_tasks(student_hash);
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON user_tasks(status);
+CREATE INDEX IF NOT EXISTS idx_tasks_company ON user_tasks(company_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_created ON user_tasks(created_at DESC);
+
 CREATE TABLE IF NOT EXISTS reviews (
     id                  UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
     company_id          UUID            NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
@@ -245,6 +263,12 @@ INSERT INTO upcoming_events (title, description, event_time, event_type, locatio
 ('Q&A Mentor Industri: BUMN & Perkapalan', 'Sesi tanya jawab dengan mentor dari PT PAL dan PT Telkom', CURRENT_TIMESTAMP + INTERVAL '5 hours 30 minutes', 'meet', 'Zoom Live'),
 ('Batas Akhir Unggah Laporan Mingguan PKL', 'Deadline pengumpulan laporan mingguan periode ini', CURRENT_TIMESTAMP + INTERVAL '8 hours', 'deadline', 'Portal Magang'),
 ('Workshop Penulisan CV & Resume', 'Pelatihan penulisan CV profesional untuk persiapan melamar magang', CURRENT_TIMESTAMP + INTERVAL '2 days', 'meet', 'Ruang Workshop Lt.3')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO user_tasks (student_hash, title, company_id, description, status, due_date) VALUES
+('hash_demo_student', 'Riset profil PT. Telkom Indonesia', 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e', 'Baca semua ulasan dan cek posisi yang tersedia', 'pending', NULL),
+('hash_demo_student', 'Bandingkan uang saku PT. Lain vs CV. Maju', 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'Analisa apakah uang saku 500rb cukup untuk transport', 'in_progress', NULL),
+('hash_demo_student', 'Tulis ulasan pengalaman magang', 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'Bagikan pengalaman setelah magang selesai', 'completed', NULL)
 ON CONFLICT DO NOTHING;
 `;
 

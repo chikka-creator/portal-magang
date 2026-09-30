@@ -6,9 +6,10 @@ import Sidebar from "@/components/Sidebar";
 import SearchBar from "@/components/SearchBar";
 import ReviewCard from "@/components/ReviewCard";
 import ReviewForm from "@/components/ReviewForm";
+import TaskForm from "@/components/TaskForm";
 import ExportButton from "@/components/ExportButton";
 import { formatRupiah } from "@/lib/format";
-import type { ReviewPublic, DashboardStats, Company, UpcomingEvent, AiBriefing, AiSearchResult } from "@/lib/types";
+import type { ReviewPublic, DashboardStats, Company, UpcomingEvent, AiBriefing, AiSearchResult, UserTask } from "@/lib/types";
 
 function getGreeting(): string {
   const h = new Date().getHours();
@@ -33,17 +34,15 @@ export default function DashboardPage() {
   const [activeSort, setActiveSort] = useState<string>("created_at");
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
-  const [selectedDayTab, setSelectedDayTab] = useState<"today" | "upcoming" | "completed">("today");
+  const [selectedTaskStatus, setSelectedTaskStatus] = useState<"pending" | "in_progress" | "completed">("pending");
 
   const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([]);
   const [aiBriefing, setAiBriefing] = useState<AiBriefing | null>(null);
   const [aiSearchResults, setAiSearchResults] = useState<AiSearchResult[]>([]);
   const [aiSearchOpen, setAiSearchOpen] = useState(false);
   const [aiSearchLoading, setAiSearchLoading] = useState(false);
-  const [todayCompanies, setTodayCompanies] = useState<Company[]>([]);
-  const [upcomingCompanies, setUpcomingCompanies] = useState<Company[]>([]);
-  const [completedCompanies, setCompletedCompanies] = useState<Company[]>([]);
-  const [todoCompanies, setTodoCompanies] = useState<Set<string>>(new Set());
+  const [userTasks, setUserTasks] = useState<UserTask[]>([]);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const aiSearchRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
@@ -79,58 +78,73 @@ export default function DashboardPage() {
     }
   };
 
-  const fetchTodoCompanies = useCallback(async () => {
+  const fetchUserTasks = useCallback(async () => {
     try {
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
-      const weekStart = new Date();
-      weekStart.setDate(weekStart.getDate() - 7);
-
-      const [todayRes, upcomingRes, completedRes] = await Promise.all([
-        fetch(`/api/reviews?sort=created_at&order=desc&limit=5`),
-        fetch(`/api/reviews?sort=created_at&order=desc&limit=10`),
-        fetch(`/api/companies?sort_by=reviews&sort_order=desc&limit=5`),
-      ]);
-
-      const [todayJson, upcomingJson, completedJson] = await Promise.all([
-        todayRes.json(),
-        upcomingRes.json(),
-        completedRes.json(),
-      ]);
-
-      if (todayJson.success) {
-        const todayReviews = todayJson.data.filter((r: ReviewPublic) => {
-          const d = new Date(r.created_at);
-          return d >= todayStart;
-        });
-        const todayCompanyIds = new Set(todayReviews.map((r: any) => r.company_id));
-        const uniqueToday = trending.filter(c => todayCompanyIds.has(c.id));
-        setTodayCompanies(uniqueToday.length > 0 ? uniqueToday.slice(0, 5) : trending.slice(0, 3));
-      }
-      if (upcomingJson.success) {
-        const upcomingReviews = upcomingJson.data.filter((r: ReviewPublic) => {
-          const d = new Date(r.created_at);
-          return d < todayStart && d >= weekStart;
-        });
-        const upcomingCompanyIds = new Set(upcomingReviews.map((r: any) => r.company_id));
-        const uniqueUpcoming = trending.filter(c => upcomingCompanyIds.has(c.id));
-        setUpcomingCompanies(uniqueUpcoming.length > 0 ? uniqueUpcoming.slice(0, 5) : trending.slice(0, 3));
-      }
-      if (completedJson.success) {
-        setCompletedCompanies(completedJson.data.slice(0, 5));
+      // Get student_hash from localStorage or use demo hash
+      const studentHash = localStorage.getItem("student_hash") || "hash_demo_student";
+      
+      const res = await fetch(`/api/tasks?student_hash=${encodeURIComponent(studentHash)}`);
+      const json = await res.json();
+      
+      if (json.success) {
+        setUserTasks(json.data);
       }
     } catch (err) {
-      console.error("Failed to load todo companies:", err);
+      console.error("Failed to load user tasks:", err);
     }
-  }, [trending]);
+  }, []);
+
+  const toggleTaskStatus = useCallback(async (task: UserTask) => {
+    try {
+      const newStatus = task.status === "completed" ? "pending" : "completed";
+      
+      const res = await fetch(`/api/tasks/${task.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      const json = await res.json();
+      
+      if (json.success) {
+        setUserTasks((prev) =>
+          prev.map((t) => (t.id === task.id ? json.data : t))
+        );
+      }
+    } catch (err) {
+      console.error("Failed to toggle task status:", err);
+    }
+  }, []);
+
+  const deleteTask = useCallback(async (taskId: string) => {
+    try {
+      const res = await fetch(`/api/tasks/${taskId}`, {
+        method: "DELETE",
+      });
+
+      const json = await res.json();
+      
+      if (json.success) {
+        setUserTasks((prev) => prev.filter((t) => t.id !== taskId));
+      }
+    } catch (err) {
+      console.error("Failed to delete task:", err);
+    }
+  }, []);
+
+  const getFilteredTasks = useCallback(() => {
+    return userTasks.filter((t) => t.status === selectedTaskStatus);
+  }, [userTasks, selectedTaskStatus]);
+
+  const filteredTasks = getFilteredTasks();
 
   useEffect(() => {
     fetchData();
   }, [activeSort]);
 
   useEffect(() => {
-    if (trending.length > 0) fetchTodoCompanies();
-  }, [trending, fetchTodoCompanies]);
+    fetchUserTasks();
+  }, [fetchUserTasks]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -198,29 +212,6 @@ export default function DashboardPage() {
     recognition.start();
     setIsListening(true);
   };
-
-  const toggleTodo = (companyId: string) => {
-    setTodoCompanies(prev => {
-      const next = new Set(prev);
-      if (next.has(companyId)) {
-        next.delete(companyId);
-      } else {
-        next.add(companyId);
-      }
-      return next;
-    });
-  };
-
-  const getTabCompanies = () => {
-    switch (selectedDayTab) {
-      case "today": return todayCompanies;
-      case "upcoming": return upcomingCompanies;
-      case "completed": return completedCompanies;
-      default: return todayCompanies;
-    }
-  };
-
-  const tabCompanies = getTabCompanies();
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[var(--bg-primary)]">
@@ -496,31 +487,31 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-1 bg-[var(--bg-secondary)] p-0.5 rounded-lg border border-[var(--border-primary)]">
                   <button
                     type="button"
-                    onClick={() => setSelectedDayTab("today")}
+                    onClick={() => setSelectedTaskStatus("pending")}
                     className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
-                      selectedDayTab === "today"
+                      selectedTaskStatus === "pending"
                         ? "bg-[var(--bg-card)] text-[var(--text-primary)] shadow-2xs font-semibold"
                         : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                     }`}
                   >
-                    Today
+                    Pending
                   </button>
                   <button
                     type="button"
-                    onClick={() => setSelectedDayTab("upcoming")}
+                    onClick={() => setSelectedTaskStatus("in_progress")}
                     className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
-                      selectedDayTab === "upcoming"
+                      selectedTaskStatus === "in_progress"
                         ? "bg-[var(--bg-card)] text-[var(--text-primary)] shadow-2xs font-semibold"
                         : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                     }`}
                   >
-                    Upcoming
+                    In Progress
                   </button>
                   <button
                     type="button"
-                    onClick={() => setSelectedDayTab("completed")}
+                    onClick={() => setSelectedTaskStatus("completed")}
                     className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
-                      selectedDayTab === "completed"
+                      selectedTaskStatus === "completed"
                         ? "bg-[var(--bg-card)] text-[var(--text-primary)] shadow-2xs font-semibold"
                         : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                     }`}
@@ -530,55 +521,84 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Task-Styled Target List (Identical to Lima AI wireframe items) */}
+              {/* Task List */}
               <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border-primary)] divide-y divide-[var(--border-primary)] shadow-xs">
-                {tabCompanies.length === 0 ? (
+                {filteredTasks.length === 0 ? (
                   <div className="p-6 text-center">
-                    <p className="text-xs text-[var(--text-muted)]">Memuat data...</p>
+                    <p className="text-xs text-[var(--text-muted)]">
+                      {selectedTaskStatus === "pending" && "Tidak ada tugas pending."}
+                      {selectedTaskStatus === "in_progress" && "Tidak ada tugas in progress."}
+                      {selectedTaskStatus === "completed" && "Tidak ada tugas completed."}
+                    </p>
                   </div>
                 ) : (
-                  tabCompanies.map((comp, idx) => (
-                    <Link
-                      key={comp.id}
-                      href={`/companies/${comp.id}`}
+                  filteredTasks.map((task, idx) => (
+                    <div
+                      key={task.id}
                       className="p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-[var(--bg-card-hover)] transition-colors group"
                     >
-                      <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
                         <input
                           type="checkbox"
-                          checked={todoCompanies.has(comp.id)}
-                          onChange={() => toggleTodo(comp.id)}
-                          onClick={(e) => e.stopPropagation()}
-                          className="w-4 h-4 rounded border-[var(--border-primary)] text-[var(--accent-primary)] focus:ring-0 accent-[#18181A]"
+                          checked={task.status === "completed"}
+                          onChange={() => toggleTaskStatus(task)}
+                          className="w-4 h-4 rounded border-[var(--border-primary)] text-[var(--accent-primary)] focus:ring-0 accent-[#18181A] cursor-pointer"
                         />
-                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${idx === 0 ? "bg-[#B85338]" : idx === 1 ? "bg-[#43553E]" : "bg-[#76746D]"}`} />
-                        <span className="text-xs sm:text-sm font-medium text-[var(--text-primary)] truncate group-hover:underline">
-                          {comp.name}
-                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${idx === 0 ? "bg-[#B85338]" : idx === 1 ? "bg-[#43553E]" : "bg-[#76746D]"}`} />
+                            <span className={`text-xs sm:text-sm font-medium truncate ${task.status === "completed" ? "text-[var(--text-muted)] line-through" : "text-[var(--text-primary)]"}`}>
+                              {task.title}
+                            </span>
+                          </div>
+                          <div className="mt-0.5 flex items-center gap-2 ml-4">
+                            <span className="text-[11px] text-[var(--text-muted)]">
+                              {task.company_name}
+                            </span>
+                            {task.due_date && (
+                              <span className="text-[10px] text-[var(--text-muted)]">
+                                • Due: {new Date(task.due_date).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="flex items-center gap-2.5 flex-shrink-0">
-                        {idx === 0 && selectedDayTab === "today" && (
-                          <span className="badge-sage text-[10px] hidden sm:inline-flex items-center gap-0.5">
-                            <span>★</span> AI
-                          </span>
-                        )}
-                        <span className="text-xs text-[var(--text-muted)] font-mono">
-                          {selectedDayTab === "today" ? "Hari ini" : selectedDayTab === "upcoming" ? "Mendatang" : "Selesai"}
-                        </span>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <Link
+                          href={`/companies/${task.company_id}`}
+                          className="text-[11px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                          title="Lihat perusahaan"
+                        >
+                          →
+                        </Link>
+                        <button
+                          onClick={() => deleteTask(task.id)}
+                          className="opacity-0 group-hover:opacity-100 text-[var(--text-muted)] hover:text-red-500 transition-all"
+                          title="Hapus tugas"
+                        >
+                          ×
+                        </button>
                       </div>
-                    </Link>
+                    </div>
                   ))
                 )}
 
                 {/* Add Task Button inside card footer */}
-                <div className="p-3 bg-[var(--accent-tint)]/50">
+                <div className="p-3 bg-[var(--accent-tint)]/50 flex items-center justify-between">
                   <button
-                    onClick={() => setShowReviewModal(true)}
+                    onClick={() => setIsTaskModalOpen(true)}
                     className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] font-medium transition-colors"
                   >
                     <span>+</span>
-                    <span>Add task / Tulis Ulasan Baru</span>
+                    <span>Add Task</span>
+                  </button>
+                  <button
+                    onClick={() => setShowReviewModal(true)}
+                    className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                    title="Tulis ulasan"
+                  >
+                    ✓ Tulis Ulasan
                   </button>
                 </div>
               </div>
@@ -839,6 +859,43 @@ export default function DashboardPage() {
                 fetchData();
               }}
               onCancel={() => setShowReviewModal(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Task Submission Modal */}
+      {isTaskModalOpen && (
+        <div
+          className="modal-overlay"
+          onClick={() => setIsTaskModalOpen(false)}
+        >
+          <div
+            className="modal-content w-full max-w-lg mx-4 p-5 sm:p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-[var(--border-primary)] mb-4">
+              <div>
+                <h2 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">
+                  Tambah Tugas Baru
+                </h2>
+                <p className="text-xs text-[var(--text-muted)]">
+                  Buat tugas riset atau persiapan magang
+                </p>
+              </div>
+              <button
+                onClick={() => setIsTaskModalOpen(false)}
+                className="text-[var(--text-muted)] hover:text-[var(--text-primary)] p-1 text-xs"
+              >
+                ✕
+              </button>
+            </div>
+            <TaskForm
+              onSuccess={() => {
+                setIsTaskModalOpen(false);
+                fetchUserTasks();
+              }}
+              onCancel={() => setIsTaskModalOpen(false)}
             />
           </div>
         </div>

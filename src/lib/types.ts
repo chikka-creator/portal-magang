@@ -213,6 +213,39 @@ export interface UpcomingEvent {
   is_active: boolean;
 }
 
+// ============================================================
+// User Task Types
+// ============================================================
+
+export interface UserTask {
+  id: string;
+  student_hash: string;           // Sensitive - only for validation
+  title: string;
+  company_id: string;
+  company_name?: string | null;
+  description: string | null;
+  status: "pending" | "in_progress" | "completed";
+  due_date: string | null;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateTaskRequest {
+  student_hash: string;
+  title: string;
+  company_id: string;
+  description?: string | null;
+  due_date?: string | null;
+}
+
+export interface UpdateTaskRequest {
+  title?: string;
+  description?: string | null;
+  status?: "pending" | "in_progress" | "completed";
+  due_date?: string | null;
+}
+
 export interface AiBriefing {
   topIndustry: string;
   topIndustryScore: number;
