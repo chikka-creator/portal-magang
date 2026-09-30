@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import NotificationBell from "./NotificationBell";
@@ -10,9 +11,11 @@ import NotificationBell from "./NotificationBell";
  */
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("theme") as "dark" | "light" | null;
@@ -31,6 +34,15 @@ export default function Sidebar() {
     localStorage.setItem("theme", next);
     document.documentElement.setAttribute("data-theme", next);
   };
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const menu = document.getElementById("account-menu");
+      if (menu && !menu.contains(e.target as Node)) setIsAccountMenuOpen(false);
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
 
   const navItems = [
     {
@@ -335,30 +347,58 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* User Profile Footer (Exactly like Lima AI) */}
-        <div className="p-3 border-t border-[var(--border-primary)]">
-          <Link
-            href="/profile"
-            className="flex items-center justify-between p-1.5 rounded-lg hover:bg-[var(--accent-tint)] transition-colors group"
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              {/* Moss green circular avatar with letter A */}
-              <div className="w-8 h-8 rounded-full bg-[#43553E] text-[#F4F1EA] flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-2xs">
-                A
+        {/* User Profile Footer with Dropdown Menu */}
+        <div className="p-3 border-t border-[var(--border-primary)] relative" id="account-menu">
+          <div className="relative">
+            <button
+              onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+              className="w-full flex items-center justify-between p-1.5 rounded-lg hover:bg-[var(--accent-tint)] transition-colors group"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-[#43553E] text-[#F4F1EA] flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-2xs">
+                  A
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-[var(--text-primary)] truncate">
+                    Alex Morgan
+                  </p>
+                  <p className="text-[11px] text-[var(--text-muted)] truncate">
+                    SMK Surabaya • Pro Plan
+                  </p>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="text-xs font-semibold text-[var(--text-primary)] truncate">
-                  Alex Morgan
-                </p>
-                <p className="text-[11px] text-[var(--text-muted)] truncate">
-                  SMK Surabaya • Pro Plan
-                </p>
+              <span className="text-[var(--text-muted)] group-hover:text-[var(--text-primary)] text-sm px-1">
+                ···
+              </span>
+            </button>
+
+            {/* Dropdown Menu */}
+            {isAccountMenuOpen && (
+              <div className="absolute bottom-12 left-0 right-0 bg-[var(--bg-card)] border border-[var(--border-primary)] rounded-lg shadow-xl py-1 z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                <button
+                  onClick={() => { router.push("/profile"); setIsAccountMenuOpen(false); setIsOpen(false); }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--accent-tint)] transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  View Profile
+                </button>
+                <button
+                  onClick={() => {
+                    localStorage.removeItem("session");
+                    router.push("/admin/login");
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-[var(--text-secondary)] hover:text-[var(--danger)] hover:bg-[var(--danger-tint)] transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Logout
+                </button>
               </div>
-            </div>
-            <span className="text-[var(--text-muted)] group-hover:text-[var(--text-primary)] text-sm px-1">
-              ···
-            </span>
-          </Link>
+            )}
+          </div>
         </div>
       </aside>
     </>
